@@ -14,4 +14,3 @@ class usuarioModel extends Model
                                 'usuario',
                                 'clave'];
 }
-?>

@@ -7,10 +7,13 @@ class subtareaModel extends Model{
     protected $table = 'subtarea';
     protected $primaryKey = 'id';
     protected $allowedFields = [
+        'id_tarea',
         'descripcion',
         'estado',
         'prioridad',
         'fecha_vencimiento',
-        'comentario'
+        'comentario',
+        'id_responsable'
     ];
+    
 }

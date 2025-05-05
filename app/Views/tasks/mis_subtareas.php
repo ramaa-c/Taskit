@@ -2,33 +2,50 @@
 <html>
 <head>
     <title>Mis Subtareas</title>
-    <link rel="stylesheet" href="<?= base_url('public/estilos.css/') ?>">
+    <link rel="stylesheet" href="<?= base_url('public/estilos.css') ?>">
 </head>
 <body>
-    <h2>Mis Subtareas</h2>
+    <h2 class="vista-tareas__titulo">Mis Subtareas</h2>
 
     <?php if (!empty($subtareas)) : ?>
-        <ul>
-            <?php foreach ($subtareas as $subtarea) : ?>
-                <li>
-                    <strong><?= esc($subtarea->descripcion) ?></strong><br>
-                    Estado: <?= esc($subtarea->estado) ?><br>
-                    Prioridad: <?= esc($subtarea->prioridad ?? 'No definida') ?><br>
-                    Vence: <?= esc($subtarea->fecha_vencimiento ?? 'No definida') ?><br>
-                    Comentario: <?= esc($subtarea->comentario ?? '-') ?><br>
-                    Responsable: <?= esc($subtarea->id_responsable) ?><br>
-                    <a href="<?= base_url('tareas/editarSubtarea/' . $subtarea->id) ?>">Editar</a>
-                    <a href="<?= base_url('tareas/borrarSubtarea/' . $subtarea->id) ?>">Eliminar</a>
-                </li>
+        <div class="contenedor-tareas">
+            <div class="tarjeta-tarea tarjeta-tarea__header">
+                <span>Descripción</span>
+                <span>Estado</span>
+                <span>Prioridad</span>
+                <span>Fecha de vencimiento</span>
+                <span>Comentario</span>
+                <span>Responsable</span>
+                <span>Acciones</span>
+            </div>
+
+            <?php foreach ($subtareas as $subtarea) :
+                $prioridad = strtolower($subtarea->prioridad ?? 'no definida');
+                $estado = ucwords(str_replace('_', ' ', strtolower($subtarea->estado)));
+                $prioridadFormateada = ucfirst($prioridad);
+                $borde = 'prioridad-' . ($prioridad === 'no definida' ? 'normal' : $prioridad);
+            ?>
+                <div class="tarjeta-tarea <?= $borde ?>">
+                    <span><?= esc($subtarea->descripcion) ?></span>
+                    <span><?= esc($estado) ?></span>
+                    <span><?= esc($prioridadFormateada) ?></span>
+                    <span><?= esc($subtarea->fecha_vencimiento ?? 'No definida') ?></span>
+                    <span><?= esc($subtarea->comentario ?? '-') ?></span>
+                    <span><?= esc($subtarea->id_responsable) ?></span>
+                    <div class="tarjeta-tarea__acciones">
+                        <a href="<?= base_url('tareas/editarSubtarea/' . $subtarea->id) ?>">Editar</a>
+                        <a href="<?= base_url('tareas/borrarSubtarea/' . $subtarea->id) ?>">Eliminar</a>
+                    </div>
+                </div>
             <?php endforeach; ?>
-        </ul>
+        </div>
     <?php else : ?>
         <p>No tienes subtareas aún.</p>
     <?php endif; ?>
 
-    <br>
-    <a href="<?= base_url('tareas') ?>">Volver a tareas</a>
-    <br>
-    <a href="<?= site_url('auth/logout') ?>">Salir</a>
+    <div class="vista-tareas__footer">
+        <a href="<?= base_url('tareas') ?>">Volver a tareas</a>
+        <a href="<?= site_url('auth/logout') ?>">Salir</a>
+    </div>
 </body>
 </html>

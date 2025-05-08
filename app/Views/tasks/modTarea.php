@@ -8,9 +8,8 @@
 </head>
 <body>
 
-    <form action="<?= base_url('tareas/actualizarTarea') ?>" method="post">
-        <input type="hidden" name="id" id="id" value="<?= esc($datos['id']) ?>">
-
+<form action="<?= site_url('tareas/editar/' . $datos['id']) ?>" method="post">
+            <input type="hidden" name="id" id="id" value="<?= esc($datos['id']) ?>">
         <div>
             <label for="asunto">Asunto: </label>
             <input type="text" name="asunto" id="asunto" value="<?= esc($datos['asunto']) ?>">

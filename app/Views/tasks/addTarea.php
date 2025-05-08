@@ -8,12 +8,13 @@
 </head>
 <body>
     <a href="<?= base_url('tareas/tarea') ?>">Volver</a><br>
-    <h2>Crear Tarea</h2>
-    <form action="<?= base_url('/tareas/guardarTarea') ?>" method='post'>
 
+    <h2>Crear Tarea</h2>
+
+    <form action="<?= site_url('tareas/crear') ?>" method="post">
         <div>
             <label for="asunto">Asunto: </label>
-            <input type="text" min_length='4' name='asunto' id='asunto' value='<?= old('asunto') ?>' required>
+            <input type="text" minlength='4' name='asunto' id='asunto' value='<?= old('asunto') ?>' required>
             <?php if (session('errors.asunto')): ?>
                 <small class="text-danger"><?= esc(session('errors.asunto')) ?></small>
             <?php endif; ?>
@@ -22,7 +23,7 @@
 
         <div>
             <label for="descripcion">Descripción: </label>
-            <input type="text" min_length='4' name='descripcion' id='descripcion' value='<?= old('descripcion') ?>' required>
+            <input type="text" minlength='4' name='descripcion' id='descripcion' value='<?= old('descripcion') ?>' required>
             <?php if (session('errors.descripcion')): ?>
                 <small class="text-danger"><?= esc(session('errors.descripcion')) ?></small>
             <?php endif; ?>

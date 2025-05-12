@@ -99,15 +99,25 @@
         public function borrarTarea($id){
 
             $tareaModel = new tareaModel();
+            $session = session();
 
-            if($tareaModel->deleteTarea($id)){
-                return redirect()->to('/tareas')->with('success','Tarea eliminada con exito.');
-            }else{
-                return redirect()->to('/tareas')->with('error', 'Error al elimanr la tarea.') ;
-            
+            $tarea = $tareaModel->getTarea($id);
+
+            if (!$tarea) {
+                return redirect()->to('/tareas')->with('error', 'Tarea no encontrada.');
             }
 
+            if ($tarea['id_usuario'] != $session->get('id')) {
+                return redirect()->to('/tareas')->with('error', 'No tienes permiso para eliminar esta tarea.');
+            }
+
+            if ($tareaModel->deleteTarea($id)) {
+                return redirect()->to('/tareas')->with('success', 'Tarea eliminada con éxito.');
+            } else {
+                return redirect()->to('/tareas')->with('error', 'Error al eliminar la tarea.');
+            }
         }
+
 
         public function archivar($id){
 
@@ -118,12 +128,29 @@
                 return redirect()->back()->with('error', 'Tarea no encontrada.');
             }
 
-            if ($tareaModel->archivarTarea($id)) {
+            if ($tareaModel->archivarTarea($id, true)) {
                 return redirect()->to('/tareas')->with('success', 'Tarea archivada correctamente');
             } else {
                 return redirect()->back()->with('error', 'No se pudo archivar la tarea.');
             }
         }
+
+        public function desarchivar($id){
+
+            $tareaModel = new tareaModel();
+
+            $tarea = $tareaModel->getTarea($id);
+            if (!$tarea) {
+                return redirect()->back()->with('error', 'Tarea no encontrada.');
+            }
+
+            if ($tareaModel->archivarTarea($id, false)) {
+                return redirect()->to('/tareas')->with('success', 'Tarea desarchivada correctamente');
+            } else {
+                return redirect()->back()->with('error', 'No se pudo desarchivar la tarea.');
+            }
+        }
+
 
         public function cambiarEstado($id){
 

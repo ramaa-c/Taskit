@@ -136,14 +136,32 @@
         public function borrarSubtarea($idSubtarea){
 
             $subtareaModel = new subtareaModel();
+            $tareaModel = new tareaModel();
+            $session = session();
 
-            if ($subtareaModel->deleteSubtarea($idSubtarea)) {
-                return redirect()->to('subtareas/mis_subtareas/')->with('success','Subtarea eliminada con exito.');
-            } else {
-                return redirect()->to('subtareas/mis_subtareas/')->with('error','No se pudo eliminar la subtarea.');
+            $subtarea = $subtareaModel->getSubtarea($idSubtarea);
+
+            if (!$subtarea) {
+                return redirect()->to('subtareas/mis_subtareas/')->with('error', 'Subtarea no encontrada.');
             }
 
+            $tarea = $tareaModel->getTarea($subtarea['id_tarea']);
+
+            if (!$tarea) {
+                return redirect()->to('subtareas/mis_subtareas/')->with('error', 'Tarea asociada no encontrada.');
+            }
+
+            if ($tarea['id_usuario'] != $session->get('id')) {
+                return redirect()->to('subtareas/mis_subtareas/')->with('error', 'No tienes permiso para eliminar esta subtarea.');
+            }
+
+            if ($subtareaModel->deleteSubtarea($idSubtarea)) {
+                return redirect()->to('subtareas/mis_subtareas/')->with('success', 'Subtarea eliminada con éxito.');
+            } else {
+                return redirect()->to('subtareas/mis_subtareas/')->with('error', 'No se pudo eliminar la subtarea.');
+            }
         }
+
 
         public function cambiarEstado($id){
 

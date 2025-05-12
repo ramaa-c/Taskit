@@ -90,16 +90,24 @@ class TareaModel extends Model{
 
     public function deleteTarea ( $id ) { return $this->delete($id); }
 
-    public function archivarTarea($id){
+    public function archivarTarea($id, $archivar = true){
 
         $tarea = $this->find($id);
 
-        if ($tarea['estado'] !== 'completada') {
+        if (!$tarea) {
             return false;
         }
 
-        return $this->update($id, ['archivada' => 1]);
+        if ($archivar) {
+            if ($tarea['estado'] !== 'completada') {
+                return false;
+            }
+            return $this->update($id, ['archivada' => 1]);
+        } else {
+            return $this->update($id, ['archivada' => 0]);
+        }
     }
+
 
     public function updateEstado($id, $nuevoEstado){
 

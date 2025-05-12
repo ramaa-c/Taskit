@@ -1,3 +1,10 @@
+<?php
+if (!session()->has('id')) {
+    header('Location: ' . base_url('/login'));
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,9 +14,9 @@
     <title>Nueva Subtarea</title>
 </head>
 <body>
-    <a href="<?= base_url('tareas') ?>">Volver</a><br>
+    <a href="<?= base_url('/tareas') ?>">Volver</a><br>
     <h2>Crear SubTarea</h2>
-    <form action="<?= base_url('/tareas/guardarSubTarea') ?>" method='post'>
+    <form action="<?= base_url('/subtareas/nueva_subtarea/' . $datos['id']) ?>" method='post'>
 
         <input type="hidden" name="id_tarea" value="<?= esc($idTarea) ?>">
 
@@ -22,19 +29,7 @@
         </div>
         <br>
 
-        <div>
-            <label for="estado">Estado: </label>
-            <select name="estado" id="estado" required>
-                <option value="" selected disabled>seleccione</option>
-                <option value="definido">Definido</option>
-                <option value="en_proceso">En proceso</option>
-                <option value="completada">Completada</option>
-            </select>
-            <?php if (session('errors.estado')): ?>
-                <small class="text-danger"><?= esc(session('errors.estado')) ?></small>
-            <?php endif; ?>
-        </div>
-        <br>
+        <input type="hidden" name="estado" value="definido">
             
         <div>
             <label for="prioridad">Prioridad: </label>

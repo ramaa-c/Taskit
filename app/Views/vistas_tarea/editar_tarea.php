@@ -1,3 +1,10 @@
+<?php
+if (!session()->has('id')) {
+    header('Location: ' . base_url('/login'));
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +15,7 @@
 </head>
 <body>
 
-<form action="<?= site_url('tareas/editar/' . $datos['id']) ?>" method="post">
+<form action="<?= site_url('tareas/editar_tarea/' . $datos['id']) ?>" method="post">
             <input type="hidden" name="id" id="id" value="<?= esc($datos['id']) ?>">
         <div>
             <label for="asunto">Asunto: </label>
@@ -45,23 +52,11 @@
         </div><br>
 
         <div>
-            <?php
-                $estados = ['definido', 'en_proceso', 'completada'];
-                $estadoActual = $datos['estado'];
-            ?>
             <label for="estado">Estado: </label>
-            <select name="estado" id="estado" required>
-                <?php foreach ($estados as $estado): ?>
-                <option value="<?= esc($estado) ?>" <?= $estado === $estadoActual ? 'selected' : '' ?>>
-                    <?= esc($estado) ?>
-                </option>
-            <?php endforeach; ?>
-            </select>
-            <?php if (session('errors.estado')): ?>
-                <small class="text-danger"><?= esc(session('errors.estado')) ?></small>
-            <?php endif; ?>
-        </div><br>
-
+            <input type="hidden" name="estado" value="<?= esc($datos['estado']) ?>">
+            <span><?= esc(ucwords(str_replace('_', ' ', $datos['estado']))) ?></span>
+        </div>
+        <br>
 
         <div>
             <label for="fecha_vencimiento">Fecha de vencimiento: </label>

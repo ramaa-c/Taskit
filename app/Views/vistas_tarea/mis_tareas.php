@@ -1,3 +1,10 @@
+<?php
+if (!session()->has('id')) {
+    header('Location: ' . base_url('/login'));
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -29,7 +36,7 @@
     ?>
 
     <?php if (!empty($tareas)) : ?>
-        <a href="<?= base_url('tareas/addTarea') ?>">+Nueva</a>
+        <a href="<?= base_url('tareas/nueva_tarea') ?>">+Nueva</a>
 
         <table border="1" cellpadding="5" cellspacing="0">
             <thead>
@@ -67,8 +74,14 @@
                         <td><?= esc($tarea['fecha_creacion']) ?></td>
                         <td>
                             <a href="<?= site_url('tareas/mis_subtareas') ?>">Subtareas</a> |
-                            <a href="<?= base_url('tareas/buscarTarea/' . $tarea['id']) ?>">Editar</a> |
-                            <a href="<?= base_url('tareas/borrarTarea/' . $tarea['id']) ?>">Borrar</a>
+                            <a href="<?= base_url('tareas/editar_tarea/' . $tarea['id']) ?>">Editar</a> |
+                            <a href="<?= base_url('tareas/borrar_tarea/' . $tarea['id']) ?>">Borrar</a>
+                            
+                            <?php if ($tarea['estado'] === 'completada' && !$tarea['archivada']) : ?>
+                                <form action="<?= base_url('tareas/archivar/' . $tarea['id']) ?>" method="post" style="display:inline;">
+                                    <button type="submit">Archivar</button>
+                                </form>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -83,7 +96,7 @@
     </div>
 
     <div>
-        <a href="<?= site_url('tareas/subtareas_asignadas/') ?>">Mis subtareas</a> |
+        <a href="<?= site_url('subtareas/subtareas_asignadas/') ?>">Subtareas Asignadas</a> |
         <a href="<?= site_url('auth/logout') ?>">Salir</a>
     </div>
 

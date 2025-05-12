@@ -3,68 +3,70 @@
 namespace App\Controllers;
 
 use App\Models\usuarioModel;
+use CodeIgniter\Session\Session;
 
-class Auth extends BaseController
-{
-    public function index()
-    {
+class Auth extends BaseController{
+
+    public function login(){
+
+        $session = session();
+        
+        if ($this->request->getMethod() === 'post') {
+
+            $validation = \Config\Services::validation();
+
+            $rules = [
+                'usuario' => 'required',
+                'clave'   => 'required'
+            ];
+
+            $messages = [
+                'usuario' => [
+                    'required' => 'El nombre de usuario es obligatorio.'
+                ],
+                'clave' => [
+                    'required' => 'La contraseña es obligatoria.'
+                ]
+            ];
+
+            if (!$this->validate($rules, $messages)) {
+                return view('auth/login', [
+                    'errors' => $this->validator->getErrors(),
+                    'datos'  => $this->request->getPost()
+                ]);
+            }
+
+            $usuarioModel = new usuarioModel();
+
+            $usuarioInput = $this->request->getPost('usuario');
+            $claveInput   = $this->request->getPost('clave');
+
+            $usuario = $usuarioModel->verificarCredenciales($usuarioInput, $claveInput);
+
+            if (!$usuario) {
+                return view('auth/login', [
+                    'errors' => ['usuario' => 'Usuario o contraseña incorrectos.'],
+                    'datos'  => $this->request->getPost()
+                ]);
+            }
+
+            $session->set([
+                'usuario'   => $usuario['usuario'],
+                'id'        => $usuario['id'],
+                'logged_in' => true
+            ]);
+
+            return redirect()->to('/tareas')->with('success', 'Sesión iniciada correctamente');
+        }
+
         return view('auth/login');
     }
 
-    public function login()
-    {
-        $validation = \Config\Services::validation();
-    
-        $rules = [
-            'usuario' => 'required',
-            'clave'   => 'required'
-        ];
-    
-        $messages = [
-            'usuario' => [
-                'required'    => 'El nombre de usuario es obligatorio.'
-            ],
-            'clave' => [
-                'required'    => 'La contraseña es obligatoria.'
-            ]
-        ];
-    
-        if (!$this->validate($rules, $messages)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-    
-        $usuarioModel = new usuarioModel();
-    
-        $usuarioInput = $this->request->getPost('usuario');
-        $claveInput   = $this->request->getPost('clave');
-    
-        $usuario = $usuarioModel->verificarCredenciales($usuarioInput, $claveInput);
-    
-        
-        if (!$usuario) {
-            return redirect()->back()->withInput()->with('errors', [
-                'usuario' => 'Usuario no encontrado.'
-            ]);
-        }
-        
-        if (!$usuario) {
-            return redirect()->back()->withInput()->with('errors', [
-                'clave' => 'Contraseña incorrecta.'
-            ]);
-        }
-    
-        session()->set([
-            'usuario'    => $usuario['usuario'],
-            'id'         => $usuario['id'],
-            'logged_in'  => true
-        ]);
-    
-        return redirect()->to('/tareas');
-    }
 
-    public function guardarUsuario()
-    {
+    public function crearUsuario(){
+
         $usuarioModel = new usuarioModel();
+        $session = session();
 
         if ($this->request->getMethod() == 'POST') {
 
@@ -87,9 +89,9 @@ class Auth extends BaseController
                 ]);
             }
     
-            $usuario = $usuarioModel->find($idInsertado);
+            $usuario = $usuarioModel->obtenerUsuarioPorId($idInsertado);
     
-            session()->set([
+            $session->set([
                 'usuario'   => $usuario['usuario'],
                 'id'        => $usuario['id'],
                 'logged_in' => true
@@ -100,13 +102,7 @@ class Auth extends BaseController
         }
 
         return view('auth/registro/');
-}
-
-    public function tarea()
-    {
-        return view('tasks/tarea');
     }
-
     public function logout()
     {
         session()->destroy();

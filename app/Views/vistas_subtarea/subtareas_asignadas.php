@@ -1,3 +1,10 @@
+<?php
+if (!session()->has('id')) {
+    header('Location: ' . base_url('/login'));
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,7 +32,7 @@
     <?php endif; ?>
 
     <br>
-    <a href="<?= base_url('tareas') ?>">Volver a tareas</a>
+    <a href="<?= base_url('/tareas') ?>">Volver a tareas</a>
     <br>
     <a href="<?= site_url('auth/logout') ?>">Salir</a>
 </body>

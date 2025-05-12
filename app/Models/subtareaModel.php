@@ -58,8 +58,7 @@ class SubtareaModel extends Model
 
     protected $skipValidation = false;
 
-    public function getSubtarea($id)
-    {
+    public function getSubtarea($id){
         return $this->find($id);
     }
 
@@ -71,12 +70,17 @@ class SubtareaModel extends Model
         return false;
     }
 
-    public function updateSubtarea($id, $data)
-    {
+    public function updateSubtarea($id, $data){
         return $this->update($id, $data);
     }
     
-    public function deleteSubtarea($id){ return $this->delete($id);}
+    public function deleteSubtarea($id){ 
+        return $this->delete($id);
+    }
+
+    public function getSubtareasPorTarea($idTarea) {
+        return $this->where('id_tarea', $idTarea)->findAll();
+    }
 
     public function getSubtareasDeUsuario($idUsuario){
 
@@ -91,6 +95,19 @@ class SubtareaModel extends Model
         return $this->where('id_responsable', $idResponsable)
                     ->findAll();
     }
+
+    public function updateEstado($id, $nuevoEstado){
+
+        return $this->update($id, ['estado' => $nuevoEstado]);
+
+    }
+
+    public function todasSubtareasCompletadas($idTarea){
+
+        return $this->where('id_tarea', $idTarea)->where('estado !=', 'completada')->countAllResults() === 0;
+
+    }
+
 
 
 }

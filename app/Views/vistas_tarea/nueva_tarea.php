@@ -1,3 +1,10 @@
+<?php
+if (!session()->has('id')) {
+    header('Location: ' . base_url('/login'));
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,11 +14,11 @@
     <title>Nueva Tarea</title>
 </head>
 <body>
-    <a href="<?= base_url('tareas/tarea') ?>">Volver</a><br>
+    <a href="<?= base_url('/tareas') ?>">Volver</a><br>
 
     <h2>Crear Tarea</h2>
 
-    <form action="<?= site_url('tareas/crear') ?>" method="post">
+    <form action="<?= site_url('tareas/nueva_tarea/') ?>" method="post">
         <div>
             <label for="asunto">Asunto: </label>
             <input type="text" minlength='4' name='asunto' id='asunto' value='<?= old('asunto') ?>' required>
@@ -44,19 +51,7 @@
         </div>
         <br>
 
-        <div>
-            <label for="estado">Estado: </label>
-            <select name="estado" id="estado" required>
-                <option value="" selected disabled>seleccione</option>
-                <option value="definido">Definido</option>
-                <option value="en_proceso">En proceso</option>
-                <option value="completada">Completada</option>
-            </select>
-            <?php if (session('errors.estado')): ?>
-                <small class="text-danger"><?= esc(session('errors.estado')) ?></small>
-            <?php endif; ?>
-        </div>
-        <br>
+        <input type="hidden" name="estado" value="definido">
         
         <div>  
             <label for="fecha_vencimiento">Fecha de vencimiento: </label>

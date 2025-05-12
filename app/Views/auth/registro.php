@@ -12,7 +12,7 @@
     <p><?= session('success') ?></p>
 <?php endif; ?>
 
-<form action="<?= base_url('/auth/guardarUsuario') ?>" method="post">
+<form action="<?= base_url('/registro') ?>" method="post">
     <?= csrf_field() ?>
 
     <div>

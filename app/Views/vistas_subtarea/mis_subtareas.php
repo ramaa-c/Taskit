@@ -1,3 +1,10 @@
+<?php
+if (!session()->has('id')) {
+    header('Location: ' . base_url('/login'));
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,8 +39,8 @@
                     <span><?= esc($subtarea->comentario ?? '-') ?></span>
                     <span><?= esc($subtarea->id_responsable) ?></span>
                     <div>
-                        <a href="<?= base_url('tareas/editarSubtarea/' . $subtarea->id) ?>">Editar</a>
-                        <a href="<?= base_url('tareas/borrarSubtarea/' . $subtarea->id) ?>">Eliminar</a>
+                        <a href="<?= base_url('subtareas/editar_subtarea/' . $subtarea['id']) ?>">Editar</a>
+                        <a href="<?= base_url('subtareas/borrar_subtarea/' . $subtarea['id']) ?>">Eliminar</a>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -43,9 +50,9 @@
     <?php endif; ?>
 
     <div>
-    <a href="<?= base_url('tareas/agregarSubtarea/' . $subtarea->id_tarea) ?>">+Subtarea</a>
-        <a href="<?= base_url('tareas') ?>">Volver a tareas</a>
-        <a href="<?= site_url('auth/logout') ?>">Salir</a>
+    <a href="<?= base_url('subtareas/nueva_subtarea/' . $subtarea['id_tarea']) ?>">+Subtarea</a>
+        <a href="<?= base_url('/tareas') ?>">Volver a tareas</a>
+        <a href="<?= site_url('/logout') ?>">Salir</a>
     </div>
 </body>
 </html>

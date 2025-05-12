@@ -10,7 +10,7 @@
         <p style="color:green;"><?= session()->getFlashdata('success') ?></p>
     <?php endif; ?>
 
-    <form action="<?= site_url('auth/login') ?>" method="post">
+    <form action="<?= site_url('/login') ?>" method="post">
         
         <div>
             <label>Usuario:</label><br>
@@ -35,6 +35,6 @@
     </form>
 
 
-    <p>¿No tenés una cuenta? <a href="<?= site_url('auth/registro') ?>">Registrarse</a></p>
+    <p>¿No tenés una cuenta? <a href="<?= site_url('/registro') ?>">Registrarse</a></p>
 </body>
 </html>

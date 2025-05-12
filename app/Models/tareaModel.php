@@ -89,4 +89,38 @@ class TareaModel extends Model{
     }    
 
     public function deleteTarea ( $id ) { return $this->delete($id); }
+
+    public function archivarTarea($id){
+
+        $tarea = $this->find($id);
+
+        if ($tarea['estado'] !== 'completada') {
+            return false;
+        }
+
+        return $this->update($id, ['archivada' => 1]);
+    }
+
+    public function updateEstado($id, $nuevoEstado){
+
+        return $this->update($id, ['estado' => $nuevoEstado]);
+
+    }
+
+    public function actualizarEstadoTarea($idTarea, $subtareaModel){
+
+        $estado = $subtareaModel->todasSubtareasCompletadas($idTarea) ? 'completada' : 'en_proceso';
+
+        $tarea = $this->find($idTarea);
+        if (!$tarea) return false;
+
+        if ($tarea['estado'] !== $estado) {
+            return $this->update($idTarea, ['estado' => $estado]);
+        }
+
+        return true;
+    }
+
+
+
 }

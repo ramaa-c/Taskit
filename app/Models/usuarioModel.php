@@ -4,8 +4,8 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class usuarioModel extends Model
-{
+class usuarioModel extends Model{
+
     protected $table = 'usuario';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
@@ -97,5 +97,17 @@ class usuarioModel extends Model
         return false;
     }
 
+    public function obtenerNombrePorId($id){
+
+        $usuario = $this->select('nombre')->find($id);
+        return $usuario ? $usuario['nombre'] : null;
+        
+    }
+
+    public function obtenerUsuarioPorId($id){
+
+        return $this->where('id', $id)->first();
+        
+    }
 
 }

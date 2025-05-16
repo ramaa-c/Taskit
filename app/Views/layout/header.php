@@ -211,24 +211,24 @@ footer {
 /* ===== PRIORIDADES ===== */
 .prioridad-badge {
     padding: 4px 10px;
-    border-radius: 12px;
+    border-radius: 15px;
     font-size: 0.85em;
     font-weight: 500;
     display: inline-block;
 }
 
 .prioridad-alta {
-    background-color: #ffebee;
-    color: #c62828;
+    background-color:rgb(242, 168, 179);
+    color: red;
 }
 
 .prioridad-media {
-    background-color: #fff8e1;
+    background-color:rgb(240, 229, 192);
     color: #f57f17;
 }
 
 .prioridad-baja {
-    background-color: #e8f5e9;
+    background-color:rgb(204, 247, 208);
     color: #2e7d32;
 }
 
@@ -249,7 +249,7 @@ footer {
     transform: translateY(-1px);
 }
 
-/* ===== ACCIONES DE TAREA (VERSIÓN CORREGIDA) ===== */
+/* ===== ACCIONES DE TAREA ===== */
 .acciones-tarea {
     display: flex;
     align-items: center;
@@ -384,24 +384,24 @@ footer {
 
 .prioridad-subtarea {
     padding: 4px 10px;
-    border-radius: 12px;
+    border-radius: 15px;
     font-size: 0.85em;
     font-weight: 500;
     display: inline-block;
 }
 
 .prioridad-subtarea.alta {
-    background-color: #ffebee;
-    color: #c62828;
+    background-color: rgb(242, 168, 179);
+    color: red;
 }
 
-.prioridad-subtarea.media {
+.prioridad-subtarea.normal {
     background-color: #fff8e1;
     color: #f57f17;
 }
 
 .prioridad-subtarea.baja {
-    background-color: #e8f5e9;
+    background-color: rgb(204, 247, 208);
     color: #2e7d32;
 }
 

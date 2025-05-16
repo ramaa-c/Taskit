@@ -103,7 +103,8 @@
                 </table>
             </div>
         <?php else : ?>
-            <p class="sin-tareas">No hay tareas aún. <a href="<?= base_url('tareas/nueva_tarea') ?>" class="btn-nueva-tarea">Crear primera tarea</a></p>
+            <p class="sin-tareas">No hay tareas aún.</p>
+            <button type="button" class="btn-nueva-tarea" onclick="abrirModalTarea()">+ Nueva Tarea</button>
         <?php endif; ?>
 
         <div id="modal-descripcion" onclick="cerrarModal()">

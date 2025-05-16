@@ -77,22 +77,15 @@ class Auth extends BaseController{
 
             $postData = $this->request->getPost();
 
-
-            if (!$usuarioModel->validate($postData)){
-                return view('auth/registro', [
-                    'errors' => $usuarioModel->errors(),
-                    'datos' => $postData
-                ]);
+            if (!$usuarioModel->validate($postData)) {
+                return redirect()->back()->withInput()->with('errors', $usuarioModel->errors());
             }
-    
+            unset($postData['confirmClave']);
             $idInsertado = $usuarioModel->insertUsuario($postData);
     
             if (!$idInsertado) {
-                return view('auth/registro', [
-                    'errors' => $usuarioModel->errors(),
-                    'datos' => $postData
-                ]);
-            }
+                return redirect()->back()->withInput()->with('errors', $usuarioModel->errors());
+            }            
     
             $usuario = $usuarioModel->obtenerUsuarioPorId($idInsertado);
     
@@ -108,6 +101,7 @@ class Auth extends BaseController{
 
         return view('auth/registro');
     }
+
     public function logout()
     {
         session()->destroy();

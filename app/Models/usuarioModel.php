@@ -22,9 +22,8 @@ class usuarioModel extends Model{
         'nombre'         => 'required|regex_match[/^[A-Za-zÀ-ÿ\s\.,\'-]+$/]',
         'email'          => 'required|valid_email|is_unique[usuario.email]',
         'usuario'        => 'required|is_unique[usuario.usuario]',
-        'clave'          => 'required|min_length[8]|regex_match[/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$/]',
-        'confirmClave'   => 'required|matches[clave]'
-    ];
+        'clave'          => 'required|min_length[8]|regex_match[/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$/]'
+        ];
 
     protected $validationMessages = [
         'nombre' => [

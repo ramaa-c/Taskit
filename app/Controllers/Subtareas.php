@@ -18,18 +18,27 @@
             }
         }
 
-        public function misSubtareas(){
+        public function misSubtareas($idTarea){
 
             $userId = session()->get('id');
 
             if (!$userId) {
                 return redirect()->to('/login');
             }
-        
-            $subtareaModel = new subtareaModel();
-            $subtareas = $subtareaModel->getSubtareasDeUsuario($userId);
-        
-            return view('vistas_subtarea/mis_subtareas', ['subtareas' => $subtareas]);
+
+            session()->set('id_tarea', $idTarea);
+
+            $subtareaModel = new SubtareaModel();
+            $usuarioModel = new usuarioModel();
+
+            $usuarios = $usuarioModel->getUsuarios();
+            $subtareas = $subtareaModel->getSubtareasPorUsuarioYTarea($userId, $idTarea);
+
+            return view('vistas_subtarea/mis_subtareas', [
+                'subtareas' => $subtareas,
+                'idTarea'   => $idTarea,
+                'usuarios'  => $usuarios
+            ]);
         }
 
         public function subtareasAsignadas(){
@@ -48,42 +57,36 @@
 
         public function crearSubTarea($idTarea){
 
-            $subTareaModel = new subtareaModel();
+            $subTareaModel = new SubtareaModel();
 
-            $usuarioModel = new usuarioModel();
-
-            $usuarios = $usuarioModel->getUsuarios();
-
-            if ($this->request->getMethod() === 'POST') {
-
+            if (strtolower($this->request->getMethod()) === 'post') {
                 $postData = $this->request->getPost();
 
                 if (!$subTareaModel->validate($postData)) {
-                    return view('vistas_subtarea/nueva_subtarea', [
-                        'errors' => $subTareaModel->errors(),
-                        'datos' => $postData
-                    ]);
+                    return redirect()->to('subtareas/mis_subtareas/' . $idTarea)
+                                    ->withInput()
+                                    ->with('errors', $subTareaModel->errors())
+                                    ->with('datos', $postData)
+                                    ->with('show_modal', true);
                 }
-    
+
                 $idInsertado = $subTareaModel->insertSubtarea($postData);
-    
+
                 if (!$idInsertado) {
-                    return view('vistas_subtarea/nueva_subtarea/', [
-                        'errors' => ['general' => 'No se pudo guardar la subtarea.'],
-                        'datos' => $postData
-                    ]);
+                    return redirect()->to('subtareas/mis_subtareas/' . $idTarea)
+                                    ->withInput()
+                                    ->with('errors', ['general' => 'No se pudo guardar la subtarea.'])
+                                    ->with('datos', $postData)
+                                    ->with('show_modal', true);
                 }
 
-                return redirect()->to('subtareas/mis_subtareas/')->with('success', 'Tarea guardada correctamente.');    
-
+                return redirect()->to('subtareas/mis_subtareas/' . $idTarea)
+                                ->with('success', 'Subtarea creada correctamente.');
             }
 
-            return view('vistas_subtarea/nueva_subtarea', [
-                'idTarea' => $idTarea,
-                'usuarios' => $usuarios
-            ]);
-                    
+            return redirect()->to('subtareas/mis_subtareas/' . $idTarea);
         }
+
 
         public function editarSubtarea($idSubtarea){
 
@@ -91,45 +94,36 @@
             $usuarioModel = new usuarioModel();
             $tareaModel = new tareaModel();
             $subtarea = $subtareaModel->getSubtarea($idSubtarea);
+            $idTarea = $subtareaModel->obtenerIdTareaPorSubtarea($idSubtarea);
 
             if(!$subtarea){
-                return redirect()->to('subtareas/mis_subtareas/')->with('error','Subtarea no encontrada.');
+                return redirect()->to('subtareas/mis_subtareas/' . $idTarea)->with('error','Subtarea no encontrada.');
             }
 
             $subtarea['nombre_responsable'] = $usuarioModel->obtenerNombrePorId($subtarea['id_responsable']) ?? 'Desconocido';
 
-            if ($this->request->getMethod() === 'POST') {
+            if (strtolower($this->request->getMethod()) === 'post') {
                 $postData = $this->request->getPost();
 
                 if (!$subtareaModel->validate($postData)) {
-                    return view('vistas_subtarea/editar_subtarea/', [
-                        'datos' => array_merge($postData, ['nombre_responsable' => $subtarea['nombre_responsable']]),
-                        'errors'=> $subtareaModel->errors()
-
-                    ]);
+                    return redirect()->to('subtareas/mis_subtareas/' . $idTarea)
+                        ->with('errorsEditSub', $subtareaModel->errors())
+                        ->with('datosEditSub', array_merge($postData, ['id' => $idSubtarea,'nombre_responsable' => $subtarea['nombre_responsable']]))
+                        ->with('show_modal_editar', true);
                 }
 
                 if (!$subtareaModel->updateSubtarea($idSubtarea, $postData)) {
-                    return view('vistas_subtarea/editar_subtarea/', [
-                        'datos' => array_merge($postData, ['nombre_responsable' => $subtarea['nombre_responsable']]),
-                        'errors'=> ['general'=> 'No se pudo actualizar la subtarea.']
-                    ]);
-
+                    return redirect()->to('subtareas/mis_subtareas/' . $idTarea)
+                        ->with('errorsEdit', $subtareaModel->errors())
+                        ->with('datosEditSub', array_merge($postData, ['id' => $idSubtarea,'nombre_responsable' => $subtarea['nombre_responsable']]))
+                        ->with('show_modal_editar', true);
                 }
 
-                if (isset($postData['estado']) && $postData['estado'] === 'completada') {
-                    $tarea = $tareaModel->getTarea($subtarea['id_tarea']);
-
-                    if ($tarea && $tarea['estado'] === 'definido') {
-                        $tareaModel->update($tarea['id'], ['estado' => 'en_proceso']);
-                    }
-                }
-
-                    return redirect()->to('subtareas/mis_subtareas/')->with('success','Subtarea actualizada correctamente.');
+                    return redirect()->to('subtareas/mis_subtareas/' . $idTarea)->with('success','Subtarea actualizada correctamente.');
 
             }
-
-            return view('vistas_subtarea/editar_subtarea/', ['datos' => $subtarea]);
+            session()->remove(['datosEditSub', 'show_modal_editar', 'errorsEditSub']);
+            return view('vistas_subtarea/editar_subtarea', ['datos' => $subtarea]);
 
         }
 
@@ -137,28 +131,29 @@
 
             $subtareaModel = new subtareaModel();
             $tareaModel = new tareaModel();
+            $idTarea = $subtareaModel->obtenerIdTareaPorSubtarea($idSubtarea);
             $session = session();
 
             $subtarea = $subtareaModel->getSubtarea($idSubtarea);
 
             if (!$subtarea) {
-                return redirect()->to('subtareas/mis_subtareas/')->with('error', 'Subtarea no encontrada.');
+                return redirect()->to('subtareas/mis_subtareas/' . $idTarea)->with('error', 'Subtarea no encontrada.');
             }
 
             $tarea = $tareaModel->getTarea($subtarea['id_tarea']);
 
             if (!$tarea) {
-                return redirect()->to('subtareas/mis_subtareas/')->with('error', 'Tarea asociada no encontrada.');
+                return redirect()->to('subtareas/mis_subtareas/' . $idTarea)->with('error', 'Tarea asociada no encontrada.');
             }
 
             if ($tarea['id_usuario'] != $session->get('id')) {
-                return redirect()->to('subtareas/mis_subtareas/')->with('error', 'No tienes permiso para eliminar esta subtarea.');
+                return redirect()->to('subtareas/mis_subtareas/' . $idTarea)->with('error', 'No tienes permiso para eliminar esta subtarea.');
             }
 
             if ($subtareaModel->deleteSubtarea($idSubtarea)) {
-                return redirect()->to('subtareas/mis_subtareas/')->with('success', 'Subtarea eliminada con éxito.');
+                return redirect()->to('subtareas/mis_subtareas/' . $idTarea)->with('success', 'Subtarea eliminada con éxito.');
             } else {
-                return redirect()->to('subtareas/mis_subtareas/')->with('error', 'No se pudo eliminar la subtarea.');
+                return redirect()->to('subtareas/mis_subtareas/' . $idTarea)->with('error', 'No se pudo eliminar la subtarea.');
             }
         }
 
@@ -178,7 +173,7 @@
                 return redirect()->back()->with('error', 'Estado no permitido.');
             }
 
-            if (!$subtareaModel->actualizarEstado($id, $nuevoEstado)) {
+            if (!$subtareaModel->updateEstado($id, $nuevoEstado)) {
                 return redirect()->back()->with('error', 'No se pudo actualizar el estado.');
             }
 
@@ -187,5 +182,13 @@
             return redirect()->back()->with('success', 'Estado actualizado correctamente.');
         }
 
+        public function validarSubtareasCompletas() {
+            $idTarea = $this->request->getPost('id_tarea');
+            $subtareaModel = new subtareaModel();
+
+            $todoCompletado = $subtareaModel->todasSubtareasCompletadas($idTarea);
+
+            return $this->response->setJSON(['todoCompletado' => $todoCompletado]);
+        }
 
     }

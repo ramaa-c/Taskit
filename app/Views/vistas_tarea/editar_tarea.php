@@ -1,10 +1,3 @@
-<?php
-if (!session()->has('id')) {
-    header('Location: ' . base_url('/login'));
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,8 +8,10 @@ if (!session()->has('id')) {
 </head>
 <body>
 
-<form action="<?= site_url('tareas/editar_tarea/' . $datos['id']) ?>" method="post">
+    <form action="<?= site_url('tareas/editar_tarea/' . $datos['id']) ?>" method="post">
+
             <input type="hidden" name="id" id="id" value="<?= esc($datos['id']) ?>">
+            
         <div>
             <label for="asunto">Asunto: </label>
             <input type="text" name="asunto" id="asunto" value="<?= esc($datos['asunto']) ?>">

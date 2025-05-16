@@ -1,39 +1,55 @@
-<?php
-if (!session()->has('id')) {
-    header('Location: ' . base_url('/login'));
-    exit;
-}
-?>
+<?= view('layout/header', ['titulo' => 'Subtareas']) ?>
+<?= view('layout/navbar') ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Subtareas Asignadas</title>
-    <link rel="stylesheet" href="<?= base_url('public/estilos.css/') ?>">
-</head>
-<body>
-    <h2>Subtareas Asignadas a Mí</h2>
+<div class="contenedor-principal">
+    <?= view('layout/sidebar') ?>
+    <main class="contenido-principal">
+        <h2>Subtareas Asignadas a Mí</h2>
 
-    <?php if (!empty($subtareas)) : ?>
-        <ul>
-            <?php foreach ($subtareas as $subtarea) : ?>
-                <li>
-                    <strong><?= esc($subtarea['descripcion']) ?></strong><br>
-                    Estado: <?= esc($subtarea['estado']) ?><br>
-                    Prioridad: <?= esc($subtarea['prioridad'] ?? 'No definida') ?><br>
-                    Vence: <?= esc($subtarea['fecha_vencimiento'] ?? 'No definida') ?><br>
-                    Comentario: <?= esc($subtarea['comentario'] ?? '-') ?><br>
-                    <a href="<?= base_url('tareas/actualizarEstado/' . $subtarea['id']) ?>">Cambiar estado</a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    <?php else : ?>
-        <p>No tienes subtareas asignadas.</p>
-    <?php endif; ?>
+        <?php if (!empty($subtareas)) : ?>
+            <div class="subtareas-container">
+                <table class="tabla-subtareas">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Prioridad</th>
+                            <th>Fecha de vencimiento</th>
+                            <th>Comentario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($subtareas as $subtarea) :
+                            $prioridad = strtolower($subtarea['prioridad'] ?? 'no definida');
+                            $estado = ucwords(str_replace('_', ' ', strtolower($subtarea['estado'] ?? '')));
+                            $prioridadClase = '';
+                            if ($prioridad === 'alta') $prioridadClase = 'alta';
+                            elseif ($prioridad === 'normal') $prioridadClase = 'media';
+                            elseif ($prioridad === 'baja') $prioridadClase = 'baja';
+                        ?>
+                            <tr>
+                                <td><?= esc($subtarea['descripcion']) ?></td>
+                                <td>
+                                    <form action="<?= base_url('subtareas/cambiar_estado/' . $subtarea['id']) ?>" method="post" onchange="this.submit()">
+                                        <select name="estado">
+                                            <option value="en_proceso" <?= $subtarea['estado'] === 'en_proceso' ? 'selected' : '' ?>>En Proceso</option>
+                                            <option value="completada" <?= $subtarea['estado'] === 'completada' ? 'selected' : '' ?>>Completada</option>
+                                        </select>
+                                    </form>
+                                </td>
+                                <td><span class="prioridad-subtarea <?= $prioridadClase ?>"><?= esc(ucfirst($prioridad)) ?></span></td>
+                                <td><?= esc($subtarea['fecha_vencimiento'] ?? 'No definida') ?></td>
+                                <td><?= esc($subtarea['comentario'] ?? '-') ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else : ?>
+            <p style="text-align: center;">No tienes subtareas asignadas.</p>
+        <?php endif; ?>
 
-    <br>
-    <a href="<?= base_url('/tareas') ?>">Volver a tareas</a>
-    <br>
-    <a href="<?= site_url('auth/logout') ?>">Salir</a>
-</body>
-</html>
+    </main>
+</div>
+
+<?= view('layout/footer') ?>

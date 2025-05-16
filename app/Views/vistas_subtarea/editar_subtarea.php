@@ -1,10 +1,3 @@
-<?php
-if (!session()->has('id')) {
-    header('Location: ' . base_url('/login'));
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,10 +7,11 @@ if (!session()->has('id')) {
     <title>Editar Subtarea</title>
 </head>
 <body>
-    <a href="<?= base_url('/tareas') ?>">Volver</a><br>
+
+    <a href="<?= base_url('subtareas/mis_subtareas') ?>">Volver</a><br>
     <h2>Editar SubTarea</h2>
 
-    <form action="<?= base_url('/subtareas/editar_subtarea/' . $datos['id']) ?>" method="post">
+    <form action="<?= site_url('subtareas/editar_subtarea/' . $datos['id']) ?>" method="post">
         
         <input type="hidden" name="id_tarea" value="<?= esc($datos['id_tarea']) ?>">
 

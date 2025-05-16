@@ -1,10 +1,3 @@
-<?php
-if (!session()->has('id')) {
-    header('Location: ' . base_url('/login'));
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,68 +7,82 @@ if (!session()->has('id')) {
     <title>Nueva Subtarea</title>
 </head>
 <body>
-    <a href="<?= base_url('/tareas') ?>">Volver</a><br>
+    <a href="<?= base_url('/mis_tareas') ?>">Volver</a><br>
+
     <h2>Crear SubTarea</h2>
-    <form action="<?= base_url('/subtareas/nueva_subtarea/' . $datos['id']) ?>" method='post'>
+
+    <?php if (!empty($errors['general'])): ?>
+        <p style="color: red;"><?= esc($errors['general']) ?></p>
+    <?php endif; ?>
+
+    <form action="<?= base_url('/subtareas/nueva_subtarea/' . $idTarea) ?>" method="post">
 
         <input type="hidden" name="id_tarea" value="<?= esc($idTarea) ?>">
-
-        <div>
-            <label for="descripcion">Descripción: </label>
-            <input type="text" min_length='4' name='descripcion' id='descripcion' value='<?= old('descripcion') ?>' required>
-            <?php if (session('errors.descripcion')): ?>
-                <small class="text-danger"><?= esc(session('errors.descripcion')) ?></small>
-            <?php endif; ?>
-        </div>
-        <br>
-
         <input type="hidden" name="estado" value="definido">
-            
+
         <div>
-            <label for="prioridad">Prioridad: </label>
+            <label for="descripcion">Descripción:</label>
+            <input type="text" name="descripcion" id="descripcion" minlength="4" 
+                value="<?= esc(old('descripcion', $datos['descripcion'] ?? '')) ?>" required>
+            <?php if (!empty($errors['descripcion'])): ?>
+                <small class="text-danger"><?= esc($errors['descripcion']) ?></small>
+            <?php endif; ?>
+        </div>
+        <br>
+
+        <div>
+            <label for="prioridad">Prioridad:</label>
             <select name="prioridad" id="prioridad">
-                <option value="" selected disabled>seleccione</option>
-                <option value="baja">Baja</option>
-                <option value="normal">Normal</option>
-                <option value="alta">Alta</option>
+                <option value="" disabled <?= !isset($datos['prioridad']) ? 'selected' : '' ?>>Seleccione</option>
+                <option value="baja" <?= (old('prioridad', $datos['prioridad'] ?? '') === 'baja') ? 'selected' : '' ?>>Baja</option>
+                <option value="normal" <?= (old('prioridad', $datos['prioridad'] ?? '') === 'normal') ? 'selected' : '' ?>>Normal</option>
+                <option value="alta" <?= (old('prioridad', $datos['prioridad'] ?? '') === 'alta') ? 'selected' : '' ?>>Alta</option>
             </select>
-            <?php if (session('errors.prioridad')): ?>
-                <small class="text-danger"><?= esc(session('errors.prioridad')) ?></small>
-            <?php endif; ?>
-        </div>
-        <br>
-        
-        <div>  
-            <label for="fecha_vencimiento">Fecha de vencimiento: </label>
-            <input type="date" min='<?= date('Y-m-d') ?>' name='fecha_vencimiento' id='fecha_vencimiento' value='<?= old('fecha_vencimiento') ?>'>
-            <?php if (session('errors.fecha_vencimiento')): ?>
-                <small class="text-danger"><?= esc(session('errors.fecha_vencimiento')) ?></small>
+            <?php if (!empty($errors['prioridad'])): ?>
+                <small class="text-danger"><?= esc($errors['prioridad']) ?></small>
             <?php endif; ?>
         </div>
         <br>
 
         <div>
-            <label for="comentario">Comentario: </label>
-            <input type="text" name="comentario" id="comentario">
-            <?php if (session('errors.comentario')): ?>
-                <small class="text-danger"><?= esc(session('errors.comentario')) ?></small>
+            <label for="fecha_vencimiento">Fecha de vencimiento:</label>
+            <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" min="<?= date('Y-m-d') ?>" 
+                value="<?= esc(old('fecha_vencimiento', $datos['fecha_vencimiento'] ?? '')) ?>">
+            <?php if (!empty($errors['fecha_vencimiento'])): ?>
+                <small class="text-danger"><?= esc($errors['fecha_vencimiento']) ?></small>
             <?php endif; ?>
-        </div><br>
+        </div>
+        <br>
 
         <div>
-            <label for="responsable">Responsable: </label>
-            <select name="responsable" id="responsable" required>
-                <option value="" selected disabled>Seleccione un colaborador</option>
+            <label for="comentario">Comentario:</label>
+            <input type="text" name="comentario" id="comentario" 
+                value="<?= esc(old('comentario', $datos['comentario'] ?? '')) ?>">
+            <?php if (!empty($errors['comentario'])): ?>
+                <small class="text-danger"><?= esc($errors['comentario']) ?></small>
+            <?php endif; ?>
+        </div>
+        <br>
+
+        <div>
+            <label for="id_responsable">Responsable:</label>
+            <select name="id_responsable" id="id_responsable" required>
+                <option value="" disabled selected>Seleccione un colaborador</option>
                 <?php foreach ($usuarios as $usuario): ?>
-                    <option value="<?= $usuario['id'] ?>">
-                    <?= htmlspecialchars($usuario['nombre']) ?>
+                    <option value="<?= $usuario['id'] ?>" <?= old('id_responsable', $datos['id_responsable'] ?? '') == $usuario['id'] ? 'selected' : '' ?>>
+                        <?= esc($usuario['nombre']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
-        </div><br>
-        
-        <div><button type="submit">Crear</button></div>
+            <?php if (!empty($errors['id_responsable'])): ?>
+                <small class="text-danger"><?= esc($errors['id_responsable']) ?></small>
+            <?php endif; ?>
+        </div>
+        <br>
 
+        <div>
+            <button type="submit">Crear</button>
+        </div>
     </form>
 </body>
 </html>

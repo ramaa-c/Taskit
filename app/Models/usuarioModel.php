@@ -15,10 +15,8 @@ class usuarioModel extends Model{
     protected $allowedFields = ['nombre',
                                 'email',
                                 'usuario',
-                                'clave'];
-
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
+                                'clave',
+                                'confirmClave'];
     
     protected $validationRules = [
         'nombre'         => 'required|regex_match[/^[A-Za-zÀ-ÿ\s\.,\'-]+$/]',
@@ -84,7 +82,9 @@ class usuarioModel extends Model{
 
     public function verificarCredenciales($usuario, $clave){
 
-        $data = $this->where('usuario', $usuario)->first();
+        $data = $this->where('usuario', $usuario)
+             ->orWhere('email', $usuario)
+             ->first();
 
         if (!$data) {
             return null;

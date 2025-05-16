@@ -7,11 +7,18 @@ use CodeIgniter\Session\Session;
 
 class Auth extends BaseController{
 
+    public function index(){
+
+        return redirect()->to('/login');
+
+    }
+
     public function login(){
 
+        $usuarioModel = new usuarioModel();
         $session = session();
         
-        if ($this->request->getMethod() === 'post') {
+       if (strtolower($this->request->getMethod()) === 'post') {
 
             $validation = \Config\Services::validation();
 
@@ -36,8 +43,6 @@ class Auth extends BaseController{
                 ]);
             }
 
-            $usuarioModel = new usuarioModel();
-
             $usuarioInput = $this->request->getPost('usuario');
             $claveInput   = $this->request->getPost('clave');
 
@@ -56,7 +61,7 @@ class Auth extends BaseController{
                 'logged_in' => true
             ]);
 
-            return redirect()->to('/tareas')->with('success', 'Sesión iniciada correctamente');
+            return redirect()->to('/mis_tareas')->with('success', 'Sesión iniciada correctamente');
         }
 
         return view('auth/login');
@@ -68,13 +73,13 @@ class Auth extends BaseController{
         $usuarioModel = new usuarioModel();
         $session = session();
 
-        if ($this->request->getMethod() == 'POST') {
+       if (strtolower($this->request->getMethod()) === 'post') {
 
             $postData = $this->request->getPost();
 
 
             if (!$usuarioModel->validate($postData)){
-                return view('auth/registro/', [
+                return view('auth/registro', [
                     'errors' => $usuarioModel->errors(),
                     'datos' => $postData
                 ]);
@@ -83,7 +88,7 @@ class Auth extends BaseController{
             $idInsertado = $usuarioModel->insertUsuario($postData);
     
             if (!$idInsertado) {
-                return view('auth/registro/', [
+                return view('auth/registro', [
                     'errors' => $usuarioModel->errors(),
                     'datos' => $postData
                 ]);
@@ -97,11 +102,11 @@ class Auth extends BaseController{
                 'logged_in' => true
             ]);
     
-            return redirect()->to('/tareas')->with('success', 'Usuario creado con éxito.');    
+            return redirect()->to('/mis_tareas')->with('success', 'Usuario creado con éxito.');    
 
         }
 
-        return view('auth/registro/');
+        return view('auth/registro');
     }
     public function logout()
     {

@@ -18,31 +18,31 @@
     <div>
         <label for="nombre">Nombre:</label><br>
         <input type="text" name="nombre" value="<?= old('nombre') ?>">
-        <?= session('errors.nombre') ? '<span>' . session('errors.nombre') . '</span><br>' : '' ?>
+        <?= isset($errors['nombre']) ? '<span>' . esc($errors['nombre']) . '</span><br>' : '' ?>
     </div>
 
     <div>
     <label for="email">Correo electrónico:</label><br>
     <input type="email" name="email" value="<?= old('email') ?>">
-    <?= session('errors.email') ? '<span>' . session('errors.email') . '</span><br>' : '' ?>
+    <?= isset($errors['email']) ? '<span>' . esc($errors['email']) . '</span><br>' : '' ?>
     </div>
     
     <div>
         <label for="usuario">Nombre de usuario:</label><br>
         <input type="text" name="usuario" value="<?= old('usuario') ?>">
-        <?= session('errors.usuario') ? '<span>' . session('errors.usuario') . '</span><br>' : '' ?>
+        <?= isset($errors['usuario']) ? '<span>' . esc($errors['usuario']) . '</span><br>' : '' ?>
     </div> 
 
     <div>
         <label for="clave">Contraseña:</label><br>
         <input type="password" name="clave">
-        <?= session('errors.clave') ? '<span>' . session('errors.clave') . '</span><br>' : '' ?>
+        <?= isset($errors['clave']) ? '<span>' . esc($errors['clave']) . '</span><br>' : '' ?>
     </div>
     
     <div>
         <label for="confirmClave">Confirmar contraseña:</label><br>
         <input type="password" name="confirmClave">
-        <?= session('errors.confirmClave') ? '<span>' . session('errors.confirmClave') . '</span><br>' : '' ?>
+        <?= isset($errors['confirmClave']) ? '<span>' . esc($errors['confirmClave']) . '</span><br>' : '' ?>
     </div>
 
     <br>

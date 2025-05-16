@@ -27,73 +27,80 @@
                 return redirect()->to('/login');
             }
         
-            $tareaModel = new TareaModel();
-            $tareas = $tareaModel->where('id_usuario', $userId)->findAll();
-        
+            $tareaModel = new tareaModel();
+            $tareas = $tareaModel->getTareasPorUsuario($userId);
+
             return view('vistas_tarea/mis_tareas', ['tareas' => $tareas]);
         }
 
         public function crearTarea(){
+            
+            $tareaModel = new tareaModel();
 
-            $tareaModel = new TareaModel();
-        
-            if ($this->request->getMethod() === 'post') {
+            if (strtolower($this->request->getMethod()) === 'post') {
+
                 $postData = $this->request->getPost();
-        
                 $postData['id_usuario'] = session()->get('id');
-        
+
                 if (!$tareaModel->validate($postData)) {
-                    return view('vistas_tarea/nueva_tarea', [
-                        'errors' => $tareaModel->errors(),
-                        'datos' => $postData
-                    ]);
+                    return redirect()->to('/mis_tareas')
+                        ->withInput()
+                        ->with('errors', $tareaModel->errors())
+                        ->with('datos', $postData)
+                        ->with('show_modal', true);
+
                 }
-        
+
                 $idInsertado = $tareaModel->insertTarea($postData);
 
                 if (!$idInsertado) {
-                    return view('vistas_tarea/nueva_tarea', [
-                        'errors' => ['general' => 'No se pudo guardar la tarea. Intente nuevamente.'],
-                        'datos' => $postData
-                    ]);
+                    return redirect()->to('/mis_tareas')
+                        ->withInput()
+                        ->with('errors', ['general' => 'No se pudo guardar la tarea. Intente nuevamente.'])
+                        ->with('show_modal', true);
                 }
-        
-                return redirect()->to('/tareas')->with('success', 'Tarea guardada correctamente.');
+
+                return redirect()->to('/mis_tareas')->with('success', 'Tarea guardada correctamente.');
             }
-        
-            return view('vistas_tarea/nueva_tarea');
-        }        
+
+            return redirect()->to('/mis_tareas');
+        }
+
 
         public function editarTarea($id){
             
-            $tareaModel = new TareaModel();
+            $tareaModel = new tareaModel();
             $tarea = $tareaModel->getTarea($id);
-        
+
             if (!$tarea) {
-                return redirect()->to('/tareas')->with('error', 'Tarea no encontrada.');
+                return redirect()->to('/mis_tareas')->with('error', 'Tarea no encontrada.');
             }
-        
-            if ($this->request->getMethod() === 'post') {
+
+            if (strtolower($this->request->getMethod()) === 'post') {
                 $postData = $this->request->getPost();
-        
+                $postData['id'] = $id;
+
                 if (!$tareaModel->validate($postData)) {
-                    return view('vistas_tarea/editar_tarea', [
-                        'datos' => $postData,
-                        'errors' => $tareaModel->errors()
-                    ]);
+                    return redirect()->to('/mis_tareas')
+                        ->with('errorsEdit', $tareaModel->errors())
+                        ->with('datosEdit', $postData)
+                        ->with('show_modal_editar', true);
                 }
-        
+
                 if (!$tareaModel->updateTarea($id, $postData)) {
-                    return view('vistas_tarea/editar_tarea', [
-                        'datos' => $postData,
-                        'errors' => ['general' => 'No se pudo actualizar la tarea.']
-                    ]);
+                    return redirect()->to('/mis_tareas')
+                        ->with('errorsEdit', $tareaModel->errors())
+                        ->with('datosEdit', $postData)
+                        ->with('show_modal_editar', true);
                 }
-        
-                return redirect()->to('/tareas')->with('success', 'Tarea actualizada correctamente.');
+
+                return redirect()->to('/mis_tareas')->with('success', 'Tarea actualizada correctamente.');
             }
-        
-            return view('vistas_tarea/editar_tarea', ['datos' => $tarea]);
+
+            return redirect()->to('/mis_tareas')
+                ->with('datosEdit', $tarea)
+                ->with('id_tarea', $id)
+                ->with('show_modal_editar', true);
         }
 
         public function borrarTarea($id){
@@ -104,20 +111,36 @@
             $tarea = $tareaModel->getTarea($id);
 
             if (!$tarea) {
-                return redirect()->to('/tareas')->with('error', 'Tarea no encontrada.');
+                return redirect()->to('/mis_tareas')->with('error', 'Tarea no encontrada.');
             }
 
             if ($tarea['id_usuario'] != $session->get('id')) {
-                return redirect()->to('/tareas')->with('error', 'No tienes permiso para eliminar esta tarea.');
+                return redirect()->to('/mis_tareas')->with('error', 'No tienes permiso para eliminar esta tarea.');
             }
 
             if ($tareaModel->deleteTarea($id)) {
-                return redirect()->to('/tareas')->with('success', 'Tarea eliminada con éxito.');
+                return redirect()->to('/mis_tareas')->with('success', 'Tarea eliminada con éxito.');
             } else {
-                return redirect()->to('/tareas')->with('error', 'Error al eliminar la tarea.');
+                return redirect()->to('/mis_tareas')->with('error', 'Error al eliminar la tarea.');
             }
         }
 
+        public function tareasArchivadas(){
+            
+            $userId = session()->get('id');
+
+            if (!$userId) {
+                return redirect()->to('/login');
+            }
+
+            $tareaModel = new tareaModel();
+            $tareas = $tareaModel
+                ->where('archivada', 1)
+                ->where('id_usuario', $userId)
+                ->findAll();
+
+            return view('vistas_tarea/tareas_archivadas', ['tareas' => $tareas]);
+        }
 
         public function archivar($id){
 
@@ -129,7 +152,7 @@
             }
 
             if ($tareaModel->archivarTarea($id, true)) {
-                return redirect()->to('/tareas')->with('success', 'Tarea archivada correctamente');
+                return redirect()->to('/mis_tareas')->with('success', 'Tarea archivada correctamente');
             } else {
                 return redirect()->back()->with('error', 'No se pudo archivar la tarea.');
             }
@@ -145,7 +168,7 @@
             }
 
             if ($tareaModel->archivarTarea($id, false)) {
-                return redirect()->to('/tareas')->with('success', 'Tarea desarchivada correctamente');
+                return redirect()->to('/mis_tareas')->with('success', 'Tarea desarchivada correctamente');
             } else {
                 return redirect()->back()->with('error', 'No se pudo desarchivar la tarea.');
             }
@@ -155,36 +178,27 @@
         public function cambiarEstado($id){
 
             $nuevoEstado = $this->request->getPost('estado');
-
             $tareaModel = new tareaModel();
             $subtareaModel = new subtareaModel();
 
-            $tarea = $tareaModel->getTarea($id);
+            $tarea = $tareaModel->find($id);
             if (!$tarea) {
-                return redirect()->back()->with('error', 'Tarea no encontrada.');
+                return redirect()->back()->with('errors', ['general' => 'Tarea no encontrada']);
             }
 
-            $estadosPermitidos = ['definido', 'en_proceso', 'completada'];
-            if (!in_array($nuevoEstado, $estadosPermitidos)) {
-                return redirect()->back()->with('error', 'Estado no permitido.');
+            if ($tarea['estado'] === 'completada' && $nuevoEstado === 'en_proceso') {
+                session()->set('show_modal_subtarea', true);
+                session()->set('tarea_id', $id);
             }
 
-            $todasCompletadas = $subtareaModel->todasSubtareasCompletadas($id);
+            $tareaModel->update($id, ['estado' => $nuevoEstado]);
 
-            $estadoCalculado = $todasCompletadas ? 'completada' : 'en_proceso';
-
-            if ($nuevoEstado === 'completada' && !$todasCompletadas) {
-                return redirect()->back()->with('error', 'No se puede marcar la tarea como completada mientras haya subtareas pendientes.');
+            $tieneSubtareas = $subtareaModel->where('id_tarea', $id)->countAllResults() > 0;
+            if ($tieneSubtareas) {
+                $tareaModel->actualizarEstadoTarea($id, $subtareaModel);
             }
 
-            if (!$tareaModel->updateTarea($id, ['estado' => $nuevoEstado])) {
-                return redirect()->back()->with('error', 'No se pudo actualizar el estado.');
-            }
-
-            $tareaModel->actualizarEstadoTarea($id, $subtareaModel);
-
-            return redirect()->back()->with('success', 'Estado actualizado correctamente.');
+            return redirect()->back();
         }
-
 
     }

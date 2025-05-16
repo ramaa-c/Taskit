@@ -2,10 +2,9 @@
 
 namespace App\Validation;
 
-class FechaRules{
+class FechaRules {
 
-    public function after_today(string $str, string $fields, array $data): bool{
-
+    public function after_today(string $str, ?string $fields = null, array $data = []): bool {
         if (empty($str)) {
             return true;
         }
@@ -16,22 +15,23 @@ class FechaRules{
         return $fechaIngresada > $hoy;
     }
 
-    public function recordatorio_valido(string $fechaRecordatorio, string $fields, array $data): bool{
-
+    public function recordatorio_valido(string $fechaRecordatorio, ?string $fields = null, array $data = []): bool {
         if (empty($fechaRecordatorio)) {
             return true;
         }
 
-        $recordatorio = strtotime($fechaRecordatorio);
-        $hoy = strtotime(date('Y-m-d'));
+        $fechaVencimiento = $data['fecha_vencimiento'] ?? $_POST['fecha_vencimiento'] ?? null;
 
-        if (!isset($data['fecha_vencimiento']) || empty($data['fecha_vencimiento'])) {
+        if (empty($fechaVencimiento)) {
             return false;
         }
 
-        $vencimiento = strtotime($data['fecha_vencimiento']);
+        $recordatorio = strtotime($fechaRecordatorio);
+        $vencimiento = strtotime($fechaVencimiento);
+        $hoy = strtotime(date('Y-m-d'));
 
         return $recordatorio >= $hoy && $recordatorio <= $vencimiento;
     }
 
 }
+

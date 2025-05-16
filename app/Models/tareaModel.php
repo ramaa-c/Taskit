@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class TareaModel extends Model{
 
-    protected $table = 'tareas';
+    protected $table = 'tarea';
     protected $primaryKey = 'id';
 
     protected $useAutoIncrement = true;
@@ -20,18 +20,19 @@ class TareaModel extends Model{
         'prioridad',
         'estado',
         'fecha_vencimiento',
-        'fecha_recordatorio'
+        'fecha_recordatorio',
+        'archivada',
     ];
 
     protected $useTimestamps = true;
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
+    protected $createdField = 'fecha_creacion';
+    protected $updatedField  = '';
 
     protected $validationRules = [
         'asunto'                => 'required|min_length[4]',
         'descripcion'           => 'required|min_length[4]',
         'prioridad'             => 'required|in_list[baja,normal,alta]',
-        'estado'                => 'required|in_list[definido,en_proceso,completada]',
+        'estado'                => 'required|in_list[en_proceso,completada]',
         'fecha_vencimiento'     => 'required|valid_date[Y-m-d]|after_today',
         'fecha_recordatorio'    => 'permit_empty|valid_date[Y-m-d]|recordatorio_valido',
     ];
@@ -51,7 +52,7 @@ class TareaModel extends Model{
         ],
         'estado' => [
             'required' => 'El estado es obligatorio.',
-            'in_list' => 'Debe ser definido, en proceso o completada.'
+            'in_list' => 'Debe ser en proceso o completada.'
         ],
         'fecha_vencimiento' => [
             'required' => 'La fecha de vencimiento es obligatoria.',
@@ -67,7 +68,10 @@ class TareaModel extends Model{
     protected $skipValidation = false;
 
     public function getTareasPorUsuario($idUsuario){
-        return $this->where('id_usuario', $idUsuario)->findAll();
+        
+        return $this->where('id_usuario', $idUsuario)
+                    ->where('archivada',0)
+                    ->findAll();
     }
 
     public function getTarea ( $id ) { return $this->find($id);}
@@ -108,27 +112,39 @@ class TareaModel extends Model{
         }
     }
 
-
     public function updateEstado($id, $nuevoEstado){
 
         return $this->update($id, ['estado' => $nuevoEstado]);
 
     }
 
-    public function actualizarEstadoTarea($idTarea, $subtareaModel){
-
-        $estado = $subtareaModel->todasSubtareasCompletadas($idTarea) ? 'completada' : 'en_proceso';
+    public function actualizarEstadoTarea($idTarea, $subtareaModel) {
 
         $tarea = $this->find($idTarea);
         if (!$tarea) return false;
 
-        if ($tarea['estado'] !== $estado) {
-            return $this->update($idTarea, ['estado' => $estado]);
+        $totalSubtareas = $subtareaModel->where('id_tarea', $idTarea)->countAllResults();
+
+        if ($totalSubtareas === 0) {
+            return true;
+        }
+
+        $todasCompletadas = $subtareaModel->todasSubtareasCompletadas($idTarea);
+        $hayEnProceso = $subtareaModel->haySubtareasEnProceso($idTarea);
+
+        $nuevoEstado = $tarea['estado']; // por defecto, no cambiar
+
+        if ($todasCompletadas) {
+            $nuevoEstado = 'completada';
+        } elseif ($hayEnProceso) {
+            $nuevoEstado = 'en_proceso';
+        }
+
+        if ($tarea['estado'] !== $nuevoEstado) {
+            return $this->update($idTarea, ['estado' => $nuevoEstado]);
         }
 
         return true;
     }
-
-
 
 }

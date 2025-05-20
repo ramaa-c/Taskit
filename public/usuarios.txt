@@ -1,0 +1,60 @@
+User: calamaro
+password: ALTAsuciedad7.
+
+User: braida
+password: braidaBR7.
+
+User: russo 
+password: Miguelo7.
+
+SQL:
+
+CREATE DATABASE IF NOT EXISTS `admin_tareas` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `admin_tareas`;
+
+-- Tabla: usuario
+CREATE TABLE IF NOT EXISTS `usuario` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `usuario` varchar(50) NOT NULL,
+  `clave` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `usuario` (`usuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Tabla: tarea
+CREATE TABLE IF NOT EXISTS `tarea` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) NOT NULL,
+  `asunto` varchar(150) NOT NULL,
+  `descripcion` text NOT NULL,
+  `prioridad` enum('baja','normal','alta') NOT NULL,
+  `estado` enum('en_proceso','completada') NOT NULL,
+  `fecha_vencimiento` date NOT NULL,
+  `fecha_recordatorio` date DEFAULT NULL,
+  `archivada` tinyint(1) DEFAULT 0,
+  `fecha_creacion` date NOT NULL DEFAULT current_date(),
+  PRIMARY KEY (`id`),
+  KEY `id_usuario` (`id_usuario`),
+  CONSTRAINT `tarea_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Tabla: subtarea
+CREATE TABLE IF NOT EXISTS `subtarea` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_tarea` int(11) NOT NULL,
+  `descripcion` text NOT NULL,
+  `estado` enum('en_proceso','completada') NOT NULL,
+  `prioridad` enum('baja','normal','alta') DEFAULT NULL,
+  `fecha_vencimiento` date DEFAULT NULL,
+  `comentario` text DEFAULT NULL,
+  `id_responsable` int(11) NOT NULL,
+  `fecha_creacion` date NOT NULL DEFAULT current_date(),
+  PRIMARY KEY (`id`),
+  KEY `id_tarea` (`id_tarea`),
+  KEY `id_responsable` (`id_responsable`),
+  CONSTRAINT `subtarea_ibfk_1` FOREIGN KEY (`id_tarea`) REFERENCES `tarea` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `subtarea_ibfk_2` FOREIGN KEY (`id_responsable`) REFERENCES `usuario` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

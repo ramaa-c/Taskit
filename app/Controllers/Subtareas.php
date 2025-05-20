@@ -18,17 +18,26 @@
             }
         }
 
-        public function misSubtareas($idTarea){
-
+        public function misSubtareas($idTarea)
+        {
             $userId = session()->get('id');
 
             if (!$userId) {
                 return redirect()->to('/login');
             }
 
+            $tareaModel = new tareaModel();
+            $tarea = $tareaModel->where('id', $idTarea)
+                                ->where('id_usuario', $userId)
+                                ->first();
+
+            if (!$tarea) {
+                return redirect()->to('mis_tareas')->with('error', 'No se encontró la tarea.');
+            }
+
             session()->set('id_tarea', $idTarea);
 
-            $subtareaModel = new SubtareaModel();
+            $subtareaModel = new subtareaModel();
             $usuarioModel = new usuarioModel();
 
             $usuarios = $usuarioModel->getUsuarios();
@@ -40,6 +49,7 @@
                 'usuarios'  => $usuarios
             ]);
         }
+
 
         public function subtareasAsignadas(){
 

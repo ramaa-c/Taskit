@@ -3,3 +3,5 @@ writable/logs/
 writable/session/
 /vendor/
 app/Views/vistas_subtarea/editar_subtarea.php
+app/Views/vistas_tarea/editar_tarea.php
+app/Views/vistas_tarea/nueva_tarea.php

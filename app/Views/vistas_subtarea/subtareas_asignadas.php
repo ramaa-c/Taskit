@@ -4,8 +4,6 @@
 <div class="contenedor-principal">
     <?= view('layout/sidebar') ?>
     <main class="contenido-principal">
-        <h2>Subtareas Asignadas a Mí</h2>
-
         <?php if (!empty($subtareas)) : ?>
             <div class="subtareas-container">
                 <table class="tabla-subtareas">
@@ -46,7 +44,7 @@
                 </table>
             </div>
         <?php else : ?>
-            <p style="text-align: center;">No tienes subtareas asignadas.</p>
+            <p class="sin-tareas">No tienes subtareas asignadas.</p>
         <?php endif; ?>
 
     </main>

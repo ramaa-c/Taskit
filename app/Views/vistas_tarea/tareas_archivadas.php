@@ -4,8 +4,6 @@
 <div class="contenedor-principal">
     <?= view('layout/sidebar') ?>
     <main class="contenido-principal">
-        <h2>Tareas Archivadas</h2>
-
         <?php helper('tareas_helper'); ?>
 
         <?php if (!empty($tareas)) : ?>
